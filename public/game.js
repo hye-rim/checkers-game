@@ -62,7 +62,7 @@ $('muteBtn').textContent = muted ? '🔇' : '🔊';
 let mode = 'easy';                  // 'easy' · 'hard' (컴퓨터) · 'online'
 let phase = 'title';                // title · play · over
 let st = null;                      // 컴퓨터 대전 판 (나는 0번 빨강)
-let lastMove = null;                // 마지막 수 { from, path, captured } (컴퓨터 모드, 온라인은 room.lastMove)
+let lastMove = null;                // 마지막 수 { who, from, path, captured } (컴퓨터 모드, 온라인은 room.lastMove)
 let sel = -1, via = [];             // 고른 말과 지금까지 고른 착지 칸들 (연속 뛰기 도중)
 let room = null, waitingNet = false, netDown = false, turnEnd = 0, recorded = '', seenMove = 0;
 let cpuTimer = 0, overTimer = 0;
@@ -117,14 +117,18 @@ function render() {
     for (const mv of legal) if (mv.from === sel && via.every((v, i) => mv.path[i] === v)) for (const c of mv.captured.slice(0, via.length + 1)) caps.add(c);
   }
   const last = new Set(m.last ? [m.last.from, ...m.last.path] : []);
+  // 상대가 방금 둔 수: 출발 칸(노란 테두리), 도착한 말(반짝 테두리), 내 말이 잡힌 칸(빨간 테두리)을 따로 보여 준다
+  const oppMoved = !!m.last && m.last.who !== undefined && m.last.who !== m.you;
+  const oppFrom = oppMoved ? m.last.from : -1, oppTo = oppMoved ? m.last.path[m.last.path.length - 1] : -1;
+  const oppCap = new Set(oppMoved ? m.last.captured : []);
   for (let k = 0; k < N * N; k++) {
     const i = toIdx(k), el = sqEls[k], v = m.board[i];
     const dk = L.dark(i);
-    el.className = 'sq' + (dk ? ' dk' : '') + (last.has(i) ? ' last' : '') + (dests.has(i) ? ' dest' : '') + (viaSet.has(i) ? ' via' : '') + (caps.has(i) ? ' cap' : '');
+    el.className = 'sq' + (dk ? ' dk' : '') + (last.has(i) ? ' last' : '') + (dests.has(i) ? ' dest' : '') + (viaSet.has(i) ? ' via' : '') + (caps.has(i) ? ' cap' : '') + (i === oppFrom ? ' lastfrom' : '') + (oppCap.has(i) ? ' lastcap' : '');
     el.innerHTML = '';
     if (v) {
       const p = document.createElement('div');
-      p.className = 'pc' + (L.isKing(v) ? ' king' : '') + (movable.has(i) && sel < 0 ? ' can' : '') + (i === sel ? ' sel' : '');
+      p.className = 'pc' + (L.isKing(v) ? ' king' : '') + (movable.has(i) && sel < 0 ? ' can' : '') + (i === sel ? ' sel' : '') + (i === oppTo ? ' opplast' : '');
       p.style.setProperty('--c', COLORS[L.sideOf(v)]);
       el.appendChild(p);
     }
@@ -198,7 +202,7 @@ function doMove(from, path) {
   if (online()) { waitingNet = true; net.send('move', { from, path }); render(); return; }
   const r = L.move(st, from, path);
   if (!r) return;
-  lastMove = { from: r.from, path: r.path, captured: r.captured, crowned: r.crowned };
+  lastMove = { who: 0, from: r.from, path: r.path, captured: r.captured, crowned: r.crowned };
   announce(0, lastMove);
   tutorialSignal('move'); if (r.captured.length) tutorialSignal('capture'); if (r.crowned) tutorialSignal('king');
   render();
@@ -229,7 +233,7 @@ function cpuTurn() {
   const mv = L.aiPick(st, mode === 'hard' ? 'hard' : 'easy');
   if (!mv) return;
   const r = L.move(st, mv.from, mv.path);
-  lastMove = { from: r.from, path: r.path, captured: r.captured, crowned: r.crowned };
+  lastMove = { who: 1, from: r.from, path: r.path, captured: r.captured, crowned: r.crowned };
   announce(1, lastMove);
   render();
   if (st.winner >= 0) { overTimer = setTimeout(showOver, T.over); return; }

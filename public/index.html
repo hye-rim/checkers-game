@@ -104,6 +104,8 @@
   .sq { position:relative; display:grid; place-items:center; background:#ffe6a8; }
   .sq.dk { background:#8a5a30; cursor:default; }
   .sq.last { background:#b37a3c; }
+  .sq.lastfrom { box-shadow:inset 0 0 0 3px rgba(255,210,63,.9); }
+  .sq.lastcap { box-shadow:inset 0 0 0 3px rgba(255,90,79,.95); }
   .sq.dest::after { content:''; position:absolute; width:34%; height:34%; border-radius:50%; background:rgba(255,210,63,.95); box-shadow:0 0 0 3px var(--ink); animation:pulse .7s ease-in-out infinite alternate; }
   .sq.dest { cursor:pointer; }
   .sq.via { background:#c9803f; }
@@ -111,6 +113,8 @@
   .pc { width:78%; height:78%; border-radius:50%; border:3px solid var(--ink); background:var(--c); box-shadow:0 3px 0 var(--ink), inset 0 -4px 0 rgba(0,0,0,.18), inset 0 3px 0 rgba(255,255,255,.35); display:grid; place-items:center; font-size:clamp(11px, 3.4vw, 18px); line-height:1; color:#fff; z-index:2; transition:transform .1s; }
   .pc.king::after { content:'♛'; color:#ffd23f; text-shadow:0 1px 0 var(--ink); }
   .pc.can { cursor:pointer; animation:bob .7s ease-in-out infinite alternate; }
+  .pc.opplast { outline:3px solid var(--yellow); outline-offset:2px; animation:ring .8s ease-in-out infinite alternate; }
+  @keyframes ring { from { outline-color:rgba(255,210,63,.35); } to { outline-color:#ffd23f; } }
   .pc.sel { transform:scale(1.12); outline:3px solid var(--yellow); outline-offset:1px; animation:none; }
   @keyframes bob { from { transform:translateY(0); } to { transform:translateY(-3px); } }
   @keyframes pulse { from { opacity:.35; transform:scale(.85); } to { opacity:1; transform:scale(1); } }
