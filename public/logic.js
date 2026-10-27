@@ -137,8 +137,8 @@ function search(st, depth, alpha, beta, side) {
   }
   return best;
 }
-// level: 'easy' 는 35% 는 아무 수나 두고 나머지는 2수 앞만 보며, 'hard' 는 6수 앞을 보고, 'best' 는 8수 앞을 본다 (시험·비교용)
-const DEPTH = { easy: 2, hard: 6, best: 8 };
+// level: 'easy' 는 35% 는 아무 수나 두고 나머지는 2수 앞만 보며, 'hard' 는 4수 앞을 보고(사람이 이길 만하게 예전 6수에서 낮춤), 'best' 는 8수 앞을 본다 (시험·비교용)
+const DEPTH = { easy: 2, hard: 4, best: 8 };
 const EASY_RANDOM = 0.35;
 function aiPick(st, level, rand = st.rand) {
   const moves = legalMoves(st);
